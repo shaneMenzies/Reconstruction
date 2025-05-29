@@ -1,3 +1,5 @@
+import pandas as pd
+
 
 QIs = {"QI1": ['F37', 'F41', 'F2', 'F17', 'F22', 'F32', 'F47'],
        "QI2": ['F37', 'F41', 'F3', 'F13', 'F18', 'F23', 'F30']}
@@ -9,15 +11,15 @@ features_50 = [f'F{i+1}' for i in range(50)]
 def calculate_reconstruction_score(df_original, df_reconstructed, hidden_features):
     total_records = len(df_original)
 
-    scores = []
+    scores = pd.DataFrame(columns=hidden_features)
     for col in hidden_features:
         value_counts = df_original[col].value_counts()
         rarity_scores = df_original[col].map(total_records / value_counts)
         max_score = rarity_scores.sum()
 
         score = ( (df_original[col].values == df_reconstructed[col].values) * rarity_scores ).sum()
-        scores.append(round(score / max_score * 100, 1))
-    return scores
+        scores.loc[0, col] = (round(score / max_score * 100, 1))
+    return scores.loc[0, :].tolist()
 
 
 def simple_accuracy_score(df_original, df_reconstructed, hidden_features):
@@ -37,4 +39,15 @@ def run_test():
         hidden_features = list(set(features_25).difference(set(qi)))
         print(hidden_features)
 
-run_test()
+
+import pandas as pd
+original = pd.read_csv("../25_PracticeProblem/25_Demo_25f_OriginalData.csv")[features_25]
+reconstructed = pd.read_csv("../25_PracticeProblem/25_QID1_synthpop_reconstructed.csv")[features_25]
+hidden = minus_QIs["QI1"]
+hidden.sort()
+results = pd.DataFrame(calculate_reconstruction_score(original, reconstructed, hidden), columns=[0], index=hidden).T
+print(results)
+print(results.loc[0, :].mean())
+
+
+

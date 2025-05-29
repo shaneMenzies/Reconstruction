@@ -43,7 +43,7 @@ def main():
         # "chained_NB": chained_nb_reconstruction,
     }
 
-    mypath = "/Users/golobs/Documents/GradSchool/NIST-CRC-25/25_PracticeProblem/"
+    mypath = "../25_PracticeProblem/"
     target_filename = "25_Demo_25f_OriginalData.csv"
     targets_original = pd.read_csv(join(mypath, target_filename))
 
@@ -57,8 +57,6 @@ def main():
             qi = QIs[qi_name]
             hidden_features = minus_QIs[qi_name]
             # hidden_features = list(set(features_25).difference(set(qi)))
-            reconstruction_scores[f"{qi_name}_random_guess"] = np.NAN
-            reconstruction_scores.loc[hidden_features, f"{qi_name}_random_guess"] = pd.Series(round(1 / targets_original.nunique() * 100, 1), index=features_25)
             targets = targets_original[qi]
 
             for deid_filename in sdg_practice_problems:
@@ -71,6 +69,7 @@ def main():
                 # recon = logistic_regression_reconstruction(deid, targets, qi, hidden_features)
                 recon, _, _ = ml_method(deid, targets, qi, hidden_features)
                 reconstruction_scores.loc[hidden_features, recon_method_name] = calculate_reconstruction_score(targets_original, recon, hidden_features)
+            reconstruction_scores.loc["AVG", recon_method_name] = reconstruction_scores.loc[hidden_features, recon_method_name].mean()
 
                 # print(qi_name, recon_method_name)
                 # for x in reconstruction_scores.loc[sorted(hidden_features), recon_method_name].T.to_numpy():
@@ -83,11 +82,7 @@ def main():
             pd.set_option('display.max_rows', None)
 
             print(qi_name)
-            for l in reconstruction_scores.loc[sorted(hidden_features)].T.to_numpy()[2:]:
-                for x in l:
-                    print(x, end=",")
-                print()
-                # print(round(l.mean(), 2))
+            print(reconstruction_scores.loc[sorted(hidden_features) + ["AVG"]].T)
             print("ave: ", round(reconstruction_scores.loc[sorted(hidden_features)].T.iloc[2:].mean().mean(), 2))
 
 

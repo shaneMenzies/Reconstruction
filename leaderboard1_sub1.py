@@ -33,7 +33,7 @@ problems = [
     ("10_MST_e10_50f_QID2", "QI2", 50, chained_nb_reconstruction),
 ]
 
-data_path = "/Users/golobs/Documents/GradSchool/NIST-CRC-25/NIST_Red-Team_Problems1-24_v2/"
+data_path = "../NIST_Red-Team_Problems1-24_v2/"
 
 def main():
     # reconstruction()

@@ -24,13 +24,13 @@ def main():
         "25_Demo_RANKSWAP_25f_Deid.csv",
         "25_Demo_MST_e10_25f_Deid.csv",
     ]
-    mypath = "/Users/golobs/Documents/GradSchool/NIST-CRC-25/25_PracticeProblem/"
+    mypath = "../25_PracticeProblem/"
     target_filename = "25_Demo_25f_OriginalData.csv"
     targets_original = pd.read_csv(join(mypath, target_filename))
 
     for qi_name in qis:
 
-        reconstruction_scores = pd.DataFrame(index=features_25)
+        reconstruction_scores = pd.DataFrame(index=(features_25))
 
         qi = QIs[qi_name]
         hidden_features = list(set(features_25).difference(set(qi)))
@@ -55,15 +55,12 @@ def main():
             reconstruction_scores[recon_method_name] = np.NAN
             recon = simply_measure_deid_itself_baseline(deid, targets, qi, hidden_features)
             reconstruction_scores.loc[hidden_features, recon_method_name] = calculate_reconstruction_score(targets_original, recon, hidden_features)
+            reconstruction_scores.loc["AVG", recon_method_name] = reconstruction_scores.loc[hidden_features, recon_method_name].mean()
 
         print()
 
         print(qi_name)
-        for l in reconstruction_scores.loc[sorted(hidden_features)].T.to_numpy():
-            for x in l:
-                print(x, end=",")
-            print()
-            # print(round(l.mean(), 2))
+        print(reconstruction_scores.loc[sorted(hidden_features) + ["AVG"]].T)
         print("ave: ", round(reconstruction_scores.loc[sorted(hidden_features)].T.mean().mean(), 2))
 
 
